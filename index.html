@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="ru">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Таймер до важного события</title>
+    <meta
+      name="description"
+      content="Красивый таймер обратного отсчёта до важного события с выбором события и полезной информацией."
+    />
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <div class="page-shell">
+      <header class="topbar">
+        <div class="brand" aria-label="Логотип таймера">
+          <span class="brand-mark">⏳</span>
+          <h1>Таймер до важного события</h1>
+        </div>
+      </header>
+
+      <main class="app">
+        <section class="card selector-card">
+          <h2>Выберите событие</h2>
+
+          <div class="form-grid">
+            <label class="field">
+              <span>Готовый вариант</span>
+              <select id="eventPreset" aria-label="Выбор события">
+                <option value="new-year">Новый год</option>
+                <option value="vacation">Каникулы</option>
+                <option value="birthday">День рождения</option>
+                <option value="custom">Своё событие</option>
+              </select>
+            </label>
+
+            <div class="custom-panel" id="customPanel">
+              <label class="field">
+                <span>Название события</span>
+                <input
+                  id="customEventName"
+                  type="text"
+                  maxlength="50"
+                  placeholder="Например: экзамен"
+                />
+              </label>
+
+              <label class="field">
+                <span>Дата события</span>
+                <input id="customEventDate" type="date" />
+              </label>
+
+              <div class="button-row">
+                <button id="applyCustomBtn" type="button" class="primary-btn">
+                  Применить
+                </button>
+                <button id="saveEventBtn" type="button" class="secondary-btn">
+                  Добавить в список
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <div id="statusMessage" class="status-message" aria-live="polite"></div>
+        </section>
+
+        <section class="card list-card">
+          <div class="list-header">
+            <h2>Мои события</h2>
+            <button id="resetEventsBtn" type="button" class="ghost-btn">Сбросить</button>
+          </div>
+          <div id="eventList" class="event-list" aria-live="polite"></div>
+        </section>
+
+        <section class="card timer-card">
+          <p class="eyebrow">До момента осталось</p>
+          <h2 id="eventTitle">Новый год</h2>
+          <p id="eventDateText" class="event-date"></p>
+
+          <div class="timer-grid" aria-label="Таймер обратного отсчёта">
+            <div class="time-box">
+              <span id="days">00</span>
+              <small>дней</small>
+            </div>
+            <div class="time-box">
+              <span id="hours">00</span>
+              <small>часов</small>
+            </div>
+            <div class="time-box">
+              <span id="minutes">00</span>
+              <small>минут</small>
+            </div>
+            <div class="time-box">
+              <span id="seconds">00</span>
+              <small>секунд</small>
+            </div>
+          </div>
+        </section>
+
+        <section class="info-grid">
+          <aside class="card fact-card">
+            <p class="card-title">Факт дня</p>
+            <p id="factText" class="fact-text"></p>
+          </aside>
+
+          <aside class="card image-card">
+            <p class="card-title">Картинка дня</p>
+            <div class="image-frame">
+              <img id="dayImage" src="" alt="Картинка дня" />
+            </div>
+          </aside>
+
+          <aside class="card quote-card">
+            <p class="card-title">Фраза дня</p>
+            <blockquote id="quoteText"></blockquote>
+            <p id="quoteAuthor" class="quote-author"></p>
+          </aside>
+        </section>
+      </main>
+    </div>
+
+    <script src="script.js"></script>
+  </body>
+</html>
