@@ -11,6 +11,9 @@
     <link rel="stylesheet" href="styles.css" />
   </head>
   <body>
+    <div class="ambient ambient-one"></div>
+    <div class="ambient ambient-two"></div>
+
     <div class="page-shell">
       <header class="topbar">
         <div class="brand" aria-label="Логотип таймера">
@@ -58,6 +61,25 @@
                   Добавить в список
                 </button>
               </div>
+            </div>
+          </div>
+
+          <div class="theme-panel" aria-label="Панель выбора цвета">
+            <div class="theme-panel-header">
+              <span>Цвет интерфейса</span>
+            </div>
+
+            <div class="mode-toggle-row" aria-label="Выбор темы">
+              <button class="mode-toggle is-active" type="button" data-mode="light">Светлая</button>
+              <button class="mode-toggle" type="button" data-mode="dark">Тёмная</button>
+            </div>
+
+            <div class="theme-swatches" role="group" aria-label="Выбор цвета">
+              <button class="theme-swatch is-active" type="button" data-theme="0" aria-label="Синий" style="--swatch: linear-gradient(135deg, #5b8cff, #7b6ef5);"></button>
+              <button class="theme-swatch" type="button" data-theme="1" aria-label="Голубой" style="--swatch: linear-gradient(135deg, #3bb7ff, #49a6ff);"></button>
+              <button class="theme-swatch" type="button" data-theme="2" aria-label="Фиолетовый" style="--swatch: linear-gradient(135deg, #8d66ff, #c06dff);"></button>
+              <button class="theme-swatch" type="button" data-theme="3" aria-label="Мятный" style="--swatch: linear-gradient(135deg, #4dd4c0, #5db7ff);"></button>
+              <button class="theme-swatch" type="button" data-theme="4" aria-label="Розовый" style="--swatch: linear-gradient(135deg, #ff7ab4, #ffb1af);"></button>
             </div>
           </div>
 
