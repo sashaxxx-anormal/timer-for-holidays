@@ -73,17 +73,73 @@
     quoteAuthor: document.getElementById('quoteAuthor')
   };
 
+  const themePalettes = [
+    { hue: 220, glow: 'rgba(94, 130, 255, 0.32)' },
+    { hue: 200, glow: 'rgba(71, 193, 255, 0.32)' },
+    { hue: 260, glow: 'rgba(167, 118, 255, 0.30)' },
+    { hue: 180, glow: 'rgba(84, 221, 217, 0.28)' },
+    { hue: 325, glow: 'rgba(255, 125, 175, 0.24)' }
+  ];
+
+  let themeIndex = 0;
   let eventList = loadEventList();
+
+  function bindThemeControls() {
+    const swatches = document.querySelectorAll('.theme-swatch');
+    const toggles = document.querySelectorAll('.mode-toggle');
+
+    swatches.forEach((swatch) => {
+      swatch.addEventListener('click', () => {
+        const selectedIndex = Number(swatch.dataset.theme);
+        themeIndex = selectedIndex;
+        applyTheme(themePalettes[selectedIndex]);
+
+        swatches.forEach((item) => {
+          item.classList.toggle('is-active', Number(item.dataset.theme) === selectedIndex);
+        });
+      });
+    });
+
+    toggles.forEach((toggle) => {
+      toggle.addEventListener('click', () => {
+        applyThemeMode(toggle.dataset.mode);
+      });
+    });
+  }
   let appState = loadSelectedEvent();
+  let lastPointerPosition = null;
+  const popLayer = document.createElement('div');
+  popLayer.className = 'bubble-pop-layer';
+  document.body.appendChild(popLayer);
 
   function init() {
     syncExpiredEvents();
+    const savedMode = localStorage.getItem('holidayTimerThemeMode') || 'light';
+    applyThemeMode(savedMode);
+    applyTheme(themePalettes[themeIndex]);
     renderSavedState();
     renderEventList();
     renderDailyContent();
     bindEvents();
+    bindThemeControls();
     updateCountdown();
     setInterval(updateCountdown, 1000);
+  }
+
+  function applyThemeMode(mode) {
+    const value = mode === 'dark' ? 'dark' : 'light';
+    document.body.setAttribute('data-theme-mode', value);
+    document.querySelectorAll('.mode-toggle').forEach((toggle) => {
+      toggle.classList.toggle('is-active', toggle.dataset.mode === value);
+    });
+    localStorage.setItem('holidayTimerThemeMode', value);
+  }
+
+  function applyTheme(theme) {
+    const root = document.documentElement;
+    root.style.setProperty('--hue', String(theme.hue));
+    root.style.setProperty('--shadow-soft', `0 30px 110px ${theme.glow}`);
+    root.style.setProperty('--shadow-card', `0 20px 48px ${theme.glow}`);
   }
 
   function getNextDate(month, day) {
@@ -213,17 +269,52 @@
     renderSelectedEvent();
   }
 
+  function triggerBubblePop(target, pointerPosition = null) {
+    if (!target || !popLayer) {
+      return;
+    }
+
+    const rect = target.getBoundingClientRect();
+    const x = pointerPosition && typeof pointerPosition.x === 'number'
+      ? pointerPosition.x
+      : rect.left + rect.width / 2;
+    const y = pointerPosition && typeof pointerPosition.y === 'number'
+      ? pointerPosition.y
+      : rect.top + rect.height / 2;
+    const bubbleCount = 16;
+
+    for (let index = 0; index < bubbleCount; index += 1) {
+      const bubble = document.createElement('span');
+      const angle = (Math.PI * 2 * index) / bubbleCount;
+      const distance = 18 + Math.random() * 62;
+      const dx = Math.cos(angle) * distance;
+      const dy = Math.sin(angle) * distance;
+
+      bubble.className = 'bubble-pop';
+      bubble.style.left = `${x}px`;
+      bubble.style.top = `${y}px`;
+      bubble.style.setProperty('--dx', `${dx}px`);
+      bubble.style.setProperty('--dy', `${dy}px`);
+      bubble.style.setProperty('--size', `${6 + Math.random() * 12}px`);
+      bubble.style.animationDelay = `${Math.random() * 70}ms`;
+      bubble.style.opacity = '0';
+
+      popLayer.appendChild(bubble);
+      setTimeout(() => bubble.remove(), 820);
+    }
+  }
+
   function bindEvents() {
+    elements.eventPreset.addEventListener('pointerdown', (event) => {
+      lastPointerPosition = { x: event.clientX, y: event.clientY };
+    });
+
     elements.eventPreset.addEventListener('change', (event) => {
       const nextMode = event.target.value;
 
       if (nextMode === 'custom') {
         elements.customPanel.classList.remove('hidden');
-        return;
-      }
-
-      if (!confirm('Вы уверены, что хотите изменить событие?')) {
-        elements.eventPreset.value = appState.mode;
+        triggerBubblePop(event.target, lastPointerPosition);
         return;
       }
 
@@ -242,18 +333,15 @@
       renderSelectedEvent();
       renderEventList();
       updateCountdown();
+      triggerBubblePop(event.target, lastPointerPosition);
     });
 
-    elements.applyCustomBtn.addEventListener('click', () => {
+    elements.applyCustomBtn.addEventListener('click', (event) => {
       const customName = elements.customEventName.value.trim();
       const customDate = elements.customEventDate.value;
 
       if (!customName || !customDate) {
         showStatus('Введите название и дату своего события.', true);
-        return;
-      }
-
-      if (!confirm('Применить новое событие и начать отсчёт?')) {
         return;
       }
 
@@ -272,6 +360,7 @@
       renderSelectedEvent();
       renderEventList();
       updateCountdown();
+      triggerBubblePop(elements.applyCustomBtn, { x: event.clientX, y: event.clientY });
       showStatus('Новое событие успешно сохранено.', false);
     });
 
@@ -377,12 +466,13 @@
         removeEventById(event.id);
       });
 
-      item.addEventListener('click', () => {
+      item.addEventListener('click', (clickEvent) => {
         appState = { ...event };
         saveSelectedEvent(appState);
         renderSavedState();
         renderEventList();
         updateCountdown();
+        triggerBubblePop(item, { x: clickEvent.clientX, y: clickEvent.clientY });
       });
 
       item.appendChild(title);
